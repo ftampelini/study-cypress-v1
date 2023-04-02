@@ -13,6 +13,7 @@ describe("Central de Atendimento ao Cliente TAT", function () {
   });
 
   it("CT 02 - Preenche os campos obrigatórios e envia o formulário.", function () {
+    const longText = Cypress._.repeat("Teste ", 20);
     cy.clock();
     cy.get("#firstName").type("Felipe");
     cy.get("#lastName").type("Caferro Tampelini");
@@ -23,7 +24,9 @@ describe("Central de Atendimento ao Cliente TAT", function () {
     cy.get("#email-checkbox").check();
     cy.get("#open-text-area")
       .should("be.visible")
-      .type("Belo curso, obrigado! Buscando conhecimento.", { delay: 0 });
+      .invoke("val", longText)
+      .should("have.value", longText);
+    //.type("Belo curso, obrigado! Buscando conhecimento.", { delay: 0 });
     cy.contains("button", "Enviar").click();
     cy.get(".success").should("be.visible");
     cy.tick(THREE_SECONDS_IN_MS);
@@ -203,4 +206,28 @@ describe("Central de Atendimento ao Cliente TAT", function () {
       .invoke("hide")
       .should("not.be.visible");
   });
+
+  it("CT 22 - Preenche a área de texto utilizando o comando 'invoke()'.", function () {
+    const longText = Cypress._.repeat("Teste ", 20);
+
+    cy.get("#open-text-area")
+      .invoke("val", longText)
+      .should("have.value", longText);
+  });
+
+  it("CT 23 - Faz uma requisição HTTP.", function () {
+    cy.request("https://cac-tat.s3.eu-central-1.amazonaws.com/index.html")
+      .should(function (response) {
+        const { status, statusText, body } = response;
+        expect(status).to.equal(200);
+        expect(statusText).to.equal("OK");
+        expect(body).to.include('CAC TAT');
+    });
+  });
+
+  it("CT 24 - Encontrando o 🐈", function () {
+    cy.get("#cat")
+      .invoke("show")
+      .should("be.visible")
+  })
 });
